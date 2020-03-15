@@ -93,6 +93,7 @@ namespace Api
             {
                 routes.MapHub<LikeHub>("/likeHub");
                 routes.MapHub<CommentHub>("/commentHub");
+                routes.MapHub<OnlineUserHub>("/onlineUserHub");
             });
 
             app.UseMvc();
