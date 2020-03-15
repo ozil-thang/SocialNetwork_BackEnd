@@ -6,6 +6,7 @@ namespace Api.Models.Profile
 {
     public class CreateProfileDto
     {
+        public string DisplayName { get; set; }
         public string Company { get; set; }
         public string Website { get; set; }
         public string Location { get; set; }

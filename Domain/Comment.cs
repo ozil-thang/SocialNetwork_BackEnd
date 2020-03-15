@@ -6,6 +6,7 @@ namespace Domain
         public Comment()
         {
         }
+        public string Id { get; set; }
         public string UserId { get; set; }
         public Profile UserProfile { get; set; }
 

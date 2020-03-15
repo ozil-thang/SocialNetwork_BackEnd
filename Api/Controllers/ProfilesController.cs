@@ -9,6 +9,7 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -85,36 +86,60 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateProfile([FromForm]CreateProfileDto createProfileDto)
+        public async Task<IActionResult> CreateProfile([FromForm]CreateProfileDto createProfileDto, [FromQuery]string edit)
         {
-            var profile = _mapper.Map<Domain.Profile>(createProfileDto);
-            profile.UserId = UserId;
+            Domain.Profile profile = null;
 
-            var uploadResult = new ImageUploadResult();
-
-            using (var stream = createProfileDto.Avatar.OpenReadStream())
+            if (!String.IsNullOrEmpty(edit) && edit == "true")
             {
-                var uploadParams = new ImageUploadParams()
+                profile = await _context.Profiles.FirstOrDefaultAsync(p => p.UserId == UserId);
+                _mapper.Map<CreateProfileDto, Domain.Profile>(createProfileDto, profile);
+
+                if (createProfileDto.Avatar != null)
                 {
-                    File = new FileDescription(createProfileDto.Avatar.Name, stream)
-                };
-                uploadResult = _cloudinary.Upload(uploadParams);
+                    var avatar = UploadImage(createProfileDto.Avatar);
+                    profile.Avatar = avatar;
+                }
+            }
+            else
+            {
+                if (createProfileDto.Avatar == null)
+                    return BadRequest();
+                profile = _mapper.Map<Domain.Profile>(createProfileDto);
+                profile.UserId = UserId;
+                var avatar = UploadImage(createProfileDto.Avatar);
+                profile.Avatar = avatar;
+
+                _context.Profiles.Add(profile);
             }
 
-            var avatar = new Photo()
-            {
-                Id = uploadResult.PublicId,
-                Url = uploadResult.Uri.ToString(),
-            };
-
-            profile.Avatar = avatar;
-
-            _context.Profiles.Add(profile);
             await _context.SaveChangesAsync();
 
             var profileDto = _mapper.Map<ProfileDto>(profile);
 
             return Ok(profileDto);
+        }
+
+        private Photo UploadImage(IFormFile img)
+        {
+
+            var uploadResult = new ImageUploadResult();
+
+            using (var stream = img.OpenReadStream())
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(img.Name, stream)
+                };
+                uploadResult = _cloudinary.Upload(uploadParams);
+            }
+
+            var photo = new Photo()
+            {
+                Id = uploadResult.PublicId,
+                Url = uploadResult.Uri.ToString(),
+            };
+            return photo;
         }
     }
 }

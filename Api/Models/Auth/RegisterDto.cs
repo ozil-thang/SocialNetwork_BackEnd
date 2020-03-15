@@ -5,7 +5,7 @@ namespace Api.Models.Auth
 {
     public class RegisterDto
     {
-        public string UserName { get; set; }
+        public string Email { get; set; }
         public string Password { get; set; }
     }
 
@@ -13,7 +13,7 @@ namespace Api.Models.Auth
     {
         public RegisterDtoValidator()
         {
-            RuleFor(x => x.UserName).NotEmpty();
+            RuleFor(x => x.Email).EmailAddress();
             RuleFor(x => x.Password).NotEmpty();
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Api.Hubs;
 using Api.Utils;
 using AutoMapper;
 using FluentValidation.AspNetCore;
@@ -55,8 +56,10 @@ namespace Api
                         ValidateAudience = false
                     };
                 });
+            services.AddSignalR();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton<RedisDatabaseProvider>();
             services.AddCors();
             services.AddSignalR();
             services.AddMvc()
@@ -85,6 +88,12 @@ namespace Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
             //app.UseHttpsRedirection();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<LikeHub>("/likeHub");
+                routes.MapHub<CommentHub>("/commentHub");
+            });
 
             app.UseMvc();
         }

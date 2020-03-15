@@ -42,7 +42,7 @@ namespace Persistence
             modelBuilder.Entity<Profile>().HasKey(p => p.UserId);
             modelBuilder.Entity<Post>().HasKey(p => p.Id);
             modelBuilder.Entity<Like>().HasKey(l => new { l.UserId, l.PostId });
-            modelBuilder.Entity<Comment>().HasKey(c => new { c.UserId, c.PostId });
+            modelBuilder.Entity<Comment>().HasKey(c => c.Id);
             modelBuilder.Entity<Education>().HasKey(e => e.Id);
             modelBuilder.Entity<Experience>().HasKey(e => e.Id);
             modelBuilder.Entity<Photo>().HasKey(p => p.Id);

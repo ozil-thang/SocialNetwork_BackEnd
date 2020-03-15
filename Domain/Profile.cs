@@ -7,10 +7,14 @@ namespace Domain
     {
         public Profile()
         {
+            Skills = new List<Skill>();
+            Experiences = new List<Experience>();
+            Educations = new List<Education>();
         }
         public string UserId { get; set; }
         public User User { get; set; }
 
+        public string DisplayName { get; set; }
         public string Company { get; set; }
         public string Website { get; set; }
         public string Location { get; set; }

@@ -24,12 +24,14 @@ namespace Api.Controllers
         private readonly SocialNetworkContext _context;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
+        private readonly RedisDatabaseProvider _redisDatabaseProvider;
 
-        public AuthController(SocialNetworkContext context, IConfiguration config, IMapper mapper)
+        public AuthController(SocialNetworkContext context, IConfiguration config, IMapper mapper, RedisDatabaseProvider redisDatabaseProvider)
         {
             _context = context;
             _config = config;
             _mapper = mapper;
+            _redisDatabaseProvider = redisDatabaseProvider;
         }
 
         [AllowAnonymous]
@@ -37,14 +39,14 @@ namespace Api.Controllers
         public async Task<IActionResult> Register([FromBody]RegisterDto registerDto)
         {
 
-            if (await _context.Users.Where(x => x.Username == registerDto.UserName).AnyAsync())
+            if (await _context.Users.Where(x => x.Email == registerDto.Email).AnyAsync())
                 return BadRequest(new Error("User already exits"));
 
             byte[] passwordHash, passwordSalt;
             PasswordUtil.CreatePasswordHash(registerDto.Password, out passwordHash, out passwordSalt);
 
             var newUser = new User();
-            newUser.Username = registerDto.UserName;
+            newUser.Email = registerDto.Email;
             newUser.PasswordHash = passwordHash;
             newUser.PasswordSalt = passwordSalt;
 
@@ -59,7 +61,7 @@ namespace Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]LoginDto loginDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == loginDto.UserName);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Email);
             if (user == null || !PasswordUtil.VerifyPasswordHash(loginDto.Password, user.PasswordHash, user.PasswordSalt))
                 return NotFound();
 
@@ -70,11 +72,16 @@ namespace Api.Controllers
         }
 
 
+
         [HttpGet]
         public async Task<IActionResult> GetCurrentUser()
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == UserId);
             var userDto = _mapper.Map<UserDto>(user);
+
+            var redisDb = _redisDatabaseProvider.GetDatabase();
+
+            redisDb.ListRightPush("onlineuser", user.Email);
 
             return Ok(userDto);
         }
@@ -88,7 +95,7 @@ namespace Api.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.Username)
+                    new Claim(ClaimTypes.Name, user.Email)
                 }),
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),

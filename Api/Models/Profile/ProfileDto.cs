@@ -12,9 +12,9 @@ namespace Api.Models.Profile
         {
 
 
-    }
+        }
         public string UserId { get; set; }
-
+        public string DisplayName { get; set; }
         public string Company { get; set; }
         public string Website { get; set; }
         public string Location { get; set; }

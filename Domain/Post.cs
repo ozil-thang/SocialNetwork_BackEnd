@@ -7,11 +7,14 @@ namespace Domain
     {
         public Post()
         {
+            Likes = new List<Like>();
+            Comments = new List<Comment>();
+            Date = DateTime.Now;
         }
         public string Id { get; set; }
 
         public string UserId { get; set; }
-        public User User { get; set; }
+        public Profile UserProfile { get; set; }
 
         public string Text { get; set; }
 
