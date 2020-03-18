@@ -20,6 +20,8 @@ Front End (Reactjs) : https://github.com/ozil-thang/SocialNetwork_Frontend
   - Database : postgresql
   - Host : heroku
 
+![alt text](https://github.com/ozil-thang/SocialNetwork_Backend/blob/master/doc/img/database.png)
+
 # Demo Features
 
 ### Authentication
