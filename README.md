@@ -21,15 +21,16 @@ Front End (Reactjs) :
 # Demo Features
 
 ### Authentication
-
+![alt text](https://github.com/ozil-thang/SocialNetwork_Backend/blob/master/doc/img/authentication.gif)
 ### Create Profile
-
+![alt text](https://github.com/ozil-thang/SocialNetwork_Backend/blob/master/doc/img/createProfile.gif)
 ### Create Post
-
+![alt text](https://github.com/ozil-thang/SocialNetwork_Backend/blob/master/doc/img/createPost.gif)
 ### Like
-
+![alt text](https://github.com/ozil-thang/SocialNetwork_Backend/blob/master/doc/img/like.gif)
 
 ### Comment
-
+![alt text](https://github.com/ozil-thang/SocialNetwork_Backend/blob/master/doc/img/comment.gif)
 
 ### View Online User
+![alt text](https://github.com/ozil-thang/SocialNetwork_Backend/blob/master/doc/img/onlineUser.gif)
