@@ -23,6 +23,7 @@ namespace Api
                 .UseKestrel(options =>
                 {
                     options.Limits.MaxRequestBodySize = 52428800; //50MB
+                    options.ListenAnyIP(Int32.Parse(System.Environment.GetEnvironmentVariable("PORT")));
                 });
     }
 }

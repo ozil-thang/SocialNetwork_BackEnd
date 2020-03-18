@@ -5,6 +5,7 @@ namespace Domain
     {
         public Like()
         {
+            Date = DateTime.Now;
         }
         public string UserId { get; set; }
         public Profile UserProfile { get; set; }

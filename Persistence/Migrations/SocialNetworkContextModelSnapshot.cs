@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence;
 
 namespace Persistence.Migrations
@@ -14,8 +15,9 @@ namespace Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasAnnotation("ProductVersion", "2.1.14-servicing-32113")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Domain.Comment", b =>
                 {
@@ -164,7 +166,7 @@ namespace Persistence.Migrations
 
                     b.Property<string>("Facebook");
 
-                    b.Property<string>("GithubUsername");
+                    b.Property<string>("GithubUserName");
 
                     b.Property<string>("Instagram");
 
@@ -242,7 +244,8 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Post", "Post")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId");
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Domain.Profile", "UserProfile")
                         .WithMany("Comments")
@@ -280,7 +283,8 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Photo", "Photo")
                         .WithOne()
-                        .HasForeignKey("Domain.Post", "PhotoId");
+                        .HasForeignKey("Domain.Post", "PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Domain.Profile", "UserProfile")
                         .WithMany()
@@ -288,7 +292,8 @@ namespace Persistence.Migrations
 
                     b.HasOne("Domain.Video", "Video")
                         .WithOne()
-                        .HasForeignKey("Domain.Post", "VideoId");
+                        .HasForeignKey("Domain.Post", "VideoId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Domain.Profile", b =>

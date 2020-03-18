@@ -5,6 +5,7 @@ namespace Domain
     {
         public Comment()
         {
+            Date = DateTime.Now;
         }
         public string Id { get; set; }
         public string UserId { get; set; }

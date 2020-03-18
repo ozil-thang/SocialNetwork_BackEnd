@@ -41,7 +41,7 @@ namespace Api
             });
             services.AddDbContext<SocialNetworkContext>(options =>
             {
-                options.UseMySql(Configuration.GetConnectionString("SocialDbConnection"));
+                options.UseNpgsql(Configuration.GetConnectionString("SocialDbConnection"));
             });
 
             var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:SecretKey").Value);

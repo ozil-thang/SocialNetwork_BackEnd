@@ -30,6 +30,9 @@ namespace Api.Models
             CreateMap<Domain.Experience, ExperienceDto>();
             CreateMap<Domain.Education, EducationDto>();
 
+            CreateMap<ExperienceDto, Domain.Experience>();
+            CreateMap<EducationDto, Domain.Education>();
+
             CreateMap<Domain.User, UserDto>();
 
             CreateMap<Domain.Post, PostItemDto>()

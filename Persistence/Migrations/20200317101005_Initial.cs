@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Persistence.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -24,7 +24,7 @@ namespace Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    Username = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<byte[]>(nullable: true),
                     PasswordSalt = table.Column<byte[]>(nullable: true),
                     Date = table.Column<DateTime>(nullable: false)
@@ -51,12 +51,13 @@ namespace Persistence.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
+                    DisplayName = table.Column<string>(nullable: true),
                     Company = table.Column<string>(nullable: true),
                     Website = table.Column<string>(nullable: true),
                     Location = table.Column<string>(nullable: true),
                     Status = table.Column<string>(nullable: true),
                     Bio = table.Column<string>(nullable: true),
-                    GithubUsername = table.Column<string>(nullable: true),
+                    GithubUserName = table.Column<string>(nullable: true),
                     Youtube = table.Column<string>(nullable: true),
                     Twitter = table.Column<string>(nullable: true),
                     Facebook = table.Column<string>(nullable: true),
@@ -79,40 +80,6 @@ namespace Persistence.Migrations
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Posts",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
-                    UserId = table.Column<string>(nullable: true),
-                    Text = table.Column<string>(nullable: true),
-                    PhotoId = table.Column<string>(nullable: true),
-                    VideoId = table.Column<string>(nullable: true),
-                    Date = table.Column<DateTime>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Posts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Posts_Photo_PhotoId",
-                        column: x => x.PhotoId,
-                        principalTable: "Photo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Posts_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Posts_Video_VideoId",
-                        column: x => x.VideoId,
-                        principalTable: "Video",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,6 +133,40 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Post",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: true),
+                    Text = table.Column<string>(nullable: true),
+                    PhotoId = table.Column<string>(nullable: true),
+                    VideoId = table.Column<string>(nullable: true),
+                    Date = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Post", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Post_Photo_PhotoId",
+                        column: x => x.PhotoId,
+                        principalTable: "Photo",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Post_Profile_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Profile",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Post_Video_VideoId",
+                        column: x => x.VideoId,
+                        principalTable: "Video",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Skill",
                 columns: table => new
                 {
@@ -195,18 +196,19 @@ namespace Persistence.Migrations
                 name: "Comment",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
-                    PostId = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: true),
+                    PostId = table.Column<string>(nullable: true),
                     Text = table.Column<string>(nullable: true),
                     Date = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comment", x => new { x.UserId, x.PostId });
+                    table.PrimaryKey("PK_Comment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comment_Posts_PostId",
+                        name: "FK_Comment_Post_PostId",
                         column: x => x.PostId,
-                        principalTable: "Posts",
+                        principalTable: "Post",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -214,7 +216,7 @@ namespace Persistence.Migrations
                         column: x => x.UserId,
                         principalTable: "Profile",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -229,9 +231,9 @@ namespace Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Like", x => new { x.UserId, x.PostId });
                     table.ForeignKey(
-                        name: "FK_Like_Posts_PostId",
+                        name: "FK_Like_Post_PostId",
                         column: x => x.PostId,
-                        principalTable: "Posts",
+                        principalTable: "Post",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -246,6 +248,11 @@ namespace Persistence.Migrations
                 name: "IX_Comment_PostId",
                 table: "Comment",
                 column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comment_UserId",
+                table: "Comment",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Education_UserId",
@@ -263,19 +270,19 @@ namespace Persistence.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_PhotoId",
-                table: "Posts",
+                name: "IX_Post_PhotoId",
+                table: "Post",
                 column: "PhotoId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_UserId",
-                table: "Posts",
+                name: "IX_Post_UserId",
+                table: "Post",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_VideoId",
-                table: "Posts",
+                name: "IX_Post_VideoId",
+                table: "Post",
                 column: "VideoId",
                 unique: true);
 
@@ -314,7 +321,7 @@ namespace Persistence.Migrations
                 name: "Skill");
 
             migrationBuilder.DropTable(
-                name: "Posts");
+                name: "Post");
 
             migrationBuilder.DropTable(
                 name: "Profile");

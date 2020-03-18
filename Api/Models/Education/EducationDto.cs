@@ -1,4 +1,7 @@
-﻿using System;
+﻿using System.Security.Cryptography.X509Certificates;
+using System;
+using FluentValidation;
+
 namespace Api.Models.Education
 {
     public class EducationDto
@@ -11,5 +14,15 @@ namespace Api.Models.Education
         public DateTime To { get; set; }
         public Boolean Current { get; set; }
         public string Description { get; set; }
+    }
+
+    public class EducationDtoValidator : AbstractValidator<EducationDto>
+    {
+        public EducationDtoValidator()
+        {
+            RuleFor(x => x.School).Must(x => !String.IsNullOrEmpty(x));
+            RuleFor(x => x.From).NotNull();
+            RuleFor(x => x.To).NotNull();
+        }
     }
 }

@@ -10,6 +10,8 @@ namespace Domain
             Skills = new List<Skill>();
             Experiences = new List<Experience>();
             Educations = new List<Education>();
+            Likes = new List<Like>();
+            Comments = new List<Comment>();
         }
         public string UserId { get; set; }
         public User User { get; set; }
@@ -21,7 +23,7 @@ namespace Domain
         public string Status { get; set; }
         public ICollection<Skill> Skills { get; set; }
         public string Bio { get; set; }
-        public string GithubUsername { get; set; }
+        public string GithubUserName { get; set; }
         public ICollection<Experience> Experiences { get; set; }
         public ICollection<Education> Educations { get; set; }
         public string Youtube { get; set; }

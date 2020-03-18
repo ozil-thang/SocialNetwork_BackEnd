@@ -21,7 +21,7 @@ namespace Api.Models.Profile
         public string Status { get; set; }
         public ICollection<string> Skills { get; set; }
         public string Bio { get; set; }
-        public string GithubUsername { get; set; }
+        public string GithubUserName { get; set; }
         public ICollection<ExperienceDto> Experiences { get; set; }
         public ICollection<EducationDto> Educations { get; set; }
         public string Youtube { get; set; }

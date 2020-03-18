@@ -80,19 +80,23 @@ namespace Persistence
 
             modelBuilder.Entity<Post>().HasMany(p => p.Likes)
                 .WithOne(l => l.Post)
-                .HasForeignKey(l => l.PostId);
+                .HasForeignKey(l => l.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Post>().HasMany(p => p.Comments)
                 .WithOne(c => c.Post)
-                .HasForeignKey(c => c.PostId);
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Post>().HasOne(p => p.Photo)
                 .WithOne()
-                .HasForeignKey<Post>(p => p.PhotoId);
+                .HasForeignKey<Post>(p => p.PhotoId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Post>().HasOne(p => p.Video)
                 .WithOne()
-                .HasForeignKey<Post>(p => p.VideoId);
+                .HasForeignKey<Post>(p => p.VideoId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }

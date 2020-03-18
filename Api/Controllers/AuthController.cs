@@ -88,33 +88,7 @@ namespace Api.Controllers
             return Ok(userDto);
         }
 
-        [HttpGet("openTab")]
-        public async Task<IActionResult> OnlineUser()
-        {
-
-            var profile = await _context.Profiles.FirstOrDefaultAsync(p => p.UserId == UserId);
-
-            var db = _redisDatabaseProvider.GetDatabase();
-
-            if (db.HashExists("onlineUserHash", profile.DisplayName))
-            {
-                db.HashIncrement("onlineUserHash", profile.DisplayName, 1);
-            }
-            else
-            {
-                db.HashSet("onlineUserHash", profile.DisplayName, 1);
-            }
-
-            db.SortedSetAdd("onlineUserSet", profile.DisplayName, DateTime.Now.Ticks);
-
-            var onlineUser = db.SortedSetRangeByScore("onlineUserSet", double.NegativeInfinity, double.PositiveInfinity,
-                                                        Exclude.None, Order.Descending).Select(t => t.ToString()).ToArray();
-
-            await _onlineUserHubContext.Clients.All.SendAsync("onlineUser", onlineUser);
-
-            return Ok();
-        }
-
+        
         private string GetToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -136,28 +110,6 @@ namespace Api.Controllers
             return tokenString;
         }
 
-        [HttpGet("closeTab")]
-        public async Task<IActionResult> OfflineUser()
-        {
-            Debug.WriteLine("closeTab Request\n");
-            var user = await _context.Users.Include(u => u.Profile).FirstOrDefaultAsync(u => u.Id == UserId);
-            var userDto = _mapper.Map<UserDto>(user);
-
-            var db = _redisDatabaseProvider.GetDatabase();
-
-            long tab = db.HashDecrement("onlineUserHash", user.Profile.DisplayName);
-
-            if (tab == 0)
-            {
-                db.SortedSetRemove("onlineUserSet", user.Profile.DisplayName);
-            }
-
-            var onlineUser = db.SortedSetRangeByScore("onlineUserSet", double.NegativeInfinity, double.PositiveInfinity,
-                                                        Exclude.None, Order.Descending).Select(t => t.ToString()).ToArray();
-
-            await _onlineUserHubContext.Clients.All.SendAsync("onlineUser", onlineUser);
-
-            return Ok(userDto);
-        }
+        
     }
 }

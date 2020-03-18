@@ -56,6 +56,7 @@ namespace Api.Controllers
                                         .Include(p => p.Likes).Include(p => p.Comments)
                                         .Include(p => p.UserProfile)
                                         .ThenInclude(pr => pr.Avatar)
+                                        .OrderByDescending(p => p.Date)
                                         .ToListAsync();
 
             var postsDto = new List<PostItemDto>();
@@ -87,6 +88,8 @@ namespace Api.Controllers
 
             if (post.Likes.Any(l => l.UserId == UserId))
                 postDetailDto.isLike = true;
+
+            postDetailDto.Comments.OrderByDescending(c => c.Date);
 
             return Ok(postDetailDto);
         }
@@ -201,8 +204,8 @@ namespace Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}/comment")]
-        public async Task<IActionResult> Comment([FromRoute]string id, [FromBody] CreateCommentDto createCommentDto)
+        [HttpPut("{id}/addcomment")]
+        public async Task<IActionResult> AddComment([FromRoute]string id, [FromBody] CreateCommentDto createCommentDto)
         {
             var comment = new Comment();
             comment.Text = createCommentDto.Text;
@@ -217,9 +220,40 @@ namespace Api.Controllers
             var commentDto = _mapper.Map<CommentDto>(comment);
             var count = _context.Comments.Where(c => c.PostId == id).Count();
             var postId = id;
-            await _commentHubContext.Clients.All.SendAsync("comment", commentDto, count, postId);
+            var type = "add";
+            await _commentHubContext.Clients.All.SendAsync("updateComment", commentDto, count, postId, type);
 
             return NoContent();
         }
+
+        [HttpPut("removecomment/{id}")]
+        public async Task<IActionResult> RemoveComment([FromRoute]string id)
+        {
+            var comment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+
+            var commentDto = comment;
+            var count = _context.Comments.Where(c => c.PostId == id).Count();
+            var postId = id;
+            var type = "remove";
+            await _commentHubContext.Clients.All.SendAsync("updateComment", commentDto, count, postId, type);
+
+            return NoContent();
+        }
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePost([FromRoute]string id)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == id);
+
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
     }
 }

@@ -5,6 +5,7 @@ namespace Api.Models.Post
     {
         public string Id { get; set; }
 
+        public string UserId { get; set; }
         public string DisplayName { get; set; }
         public string Avatar { get; set; }
 

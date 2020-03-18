@@ -4,34 +4,41 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence;
 
 namespace Persistence.Migrations
 {
     [DbContext(typeof(SocialNetworkContext))]
-    [Migration("20200313070036_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20200317101005_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasAnnotation("ProductVersion", "2.1.14-servicing-32113")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("Domain.Comment", b =>
                 {
-                    b.Property<string>("UserId");
-
-                    b.Property<string>("PostId");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("Date");
 
+                    b.Property<string>("PostId");
+
                     b.Property<string>("Text");
 
-                    b.HasKey("UserId", "PostId");
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comment");
                 });
@@ -144,7 +151,7 @@ namespace Persistence.Migrations
                     b.HasIndex("VideoId")
                         .IsUnique();
 
-                    b.ToTable("Posts");
+                    b.ToTable("Post");
                 });
 
             modelBuilder.Entity("Domain.Profile", b =>
@@ -157,9 +164,11 @@ namespace Persistence.Migrations
 
                     b.Property<string>("Company");
 
+                    b.Property<string>("DisplayName");
+
                     b.Property<string>("Facebook");
 
-                    b.Property<string>("GithubUsername");
+                    b.Property<string>("GithubUserName");
 
                     b.Property<string>("Instagram");
 
@@ -210,11 +219,11 @@ namespace Persistence.Migrations
 
                     b.Property<DateTime>("Date");
 
+                    b.Property<string>("Email");
+
                     b.Property<byte[]>("PasswordHash");
 
                     b.Property<byte[]>("PasswordSalt");
-
-                    b.Property<string>("Username");
 
                     b.HasKey("Id");
 
@@ -242,8 +251,7 @@ namespace Persistence.Migrations
 
                     b.HasOne("Domain.Profile", "UserProfile")
                         .WithMany("Comments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Domain.Education", b =>
@@ -277,15 +285,17 @@ namespace Persistence.Migrations
                 {
                     b.HasOne("Domain.Photo", "Photo")
                         .WithOne()
-                        .HasForeignKey("Domain.Post", "PhotoId");
+                        .HasForeignKey("Domain.Post", "PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Domain.User", "User")
+                    b.HasOne("Domain.Profile", "UserProfile")
                         .WithMany()
                         .HasForeignKey("UserId");
 
                     b.HasOne("Domain.Video", "Video")
                         .WithOne()
-                        .HasForeignKey("Domain.Post", "VideoId");
+                        .HasForeignKey("Domain.Post", "VideoId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Domain.Profile", b =>
